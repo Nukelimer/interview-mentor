@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { GrHide } from "react-icons/gr";
 import { BiShow } from "react-icons/bi";
 import { MdPhoneInTalk } from "react-icons/md";
-import { Toast } from "../../../../../../@/components/ui/toast";
+
 function Questions({ mockQuestion, activeQuestion, setactiveQuestion }) {
   const [ToggleNotification, setToggleNotification] = useState(true);
   const [toolTip, settoolTip] = useState(false);
@@ -19,8 +19,8 @@ function Questions({ mockQuestion, activeQuestion, setactiveQuestion }) {
     }
   };
   return (
-    <div className="p-5 rounded-xl border w-full  ">
-      <div className=" mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-content-center place-items-center gap-5 ">
+    <div className="p-5 rounded-xl border w-full   ">
+      <div className=" mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-content-center place-items-center gap-5 pt-56 h-16 overflow-y-scroll ">
         {mockQuestion
           ? mockQuestion.map((question, idx) => (
               <div key={idx}>
@@ -33,7 +33,7 @@ function Questions({ mockQuestion, activeQuestion, setactiveQuestion }) {
                 </h2>
               </div>
             ))
-          : Array.from({ length: 5 }).map((_, idx) => (
+          : Array.from({ length: 10 }).map((_, idx) => (
               <Loader2Icon
                 key={idx}
                 color="green"
@@ -47,7 +47,14 @@ function Questions({ mockQuestion, activeQuestion, setactiveQuestion }) {
           <h2 className=" py-6 border-t">
             {mockQuestion[activeQuestion]?.question}
           </h2>
-          <div className="flex gap-4" onMouseOut={()=>{settoolTip(false)}} onMouseOver={()=>{settoolTip(true)}} >
+          <div
+            className="flex gap-4"
+            onMouseOut={() => {
+              settoolTip(false);
+            }}
+            onMouseOver={() => {
+              settoolTip(true);
+            }}>
             {" "}
             <MdPhoneInTalk
               size={30}
@@ -57,9 +64,11 @@ function Questions({ mockQuestion, activeQuestion, setactiveQuestion }) {
                 textToSpeechHandler(mockQuestion[activeQuestion]?.question);
               }}
             />
-           {toolTip ?  <p className="text-sm shadow-2xl h-fit py-1 px-2 bg-green-400 rounded rounded-bl-md">
-              Read text out.
-            </p>: null}
+            {toolTip ? (
+              <p className="text-sm shadow-2xl h-fit py-1 px-2 bg-green-400 rounded rounded-bl-md">
+                Read text out.
+              </p>
+            ) : null}
           </div>
         </>
       )}

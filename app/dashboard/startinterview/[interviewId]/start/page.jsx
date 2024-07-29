@@ -32,9 +32,16 @@ function Start({ params }) {
 
   return (
     <div className="grid place-items-center grid-cols-1 md:grid-cols-2 lg:px-24 self-stretch md:mt-6 md:space-x-32 mx-10 ">
-      <Questions mockQuestion={mockQuestion} activeQuestion={activeQuestion} setactiveQuestion={ setactiveQuestion} />
+      <Questions
+        mockQuestion={mockQuestion}
+        activeQuestion={activeQuestion}
+        setactiveQuestion={setactiveQuestion}
+      />
 
-      <RecordAnswer />
+      <RecordAnswer
+        mockQuestion={mockQuestion}
+        activeQuestion={activeQuestion}
+      />
     </div>
   );
 }

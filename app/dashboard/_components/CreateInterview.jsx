@@ -60,7 +60,7 @@ function CreateInterview() {
       const parsedData = parseJSON(returnedData);
       if (parsedData) {
         setData(parsedData);
-        console.log(parsedData);
+        // console.log(parsedData);
 
         const respon = await db
           .insert(InterViewMentorSchema)
