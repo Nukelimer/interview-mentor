@@ -5,10 +5,10 @@ import { db } from "../../../../utils/DB";
 import { eq } from "drizzle-orm";
 import Webcam from "react-webcam";
 import { Loader, Spline, SplineIcon, WebcamIcon } from "lucide-react";
-import MockInterviewSchema from "../../../../utils/Schema";
+import { InterViewMentorSchema } from "../../../../utils/Schema";
 import { MdClose } from "react-icons/md";
 import Link from "next/link";
-import ToastIM  from "../../../components/Toast";
+import ToastIM from "../../../components/Toast";
 function InterviewID({ params }) {
   const [fetchedResult, setFetchedResult] = useState(null);
   const [webCamToggle, setWebCamToggle] = useState(false);
@@ -24,8 +24,8 @@ function InterviewID({ params }) {
   const getInterviewDetails = async () => {
     const result = await db
       .select()
-      .from(MockInterviewSchema)
-      .where(eq(MockInterviewSchema.mockID, params.interviewId));
+      .from(InterViewMentorSchema)
+      .where(eq(InterViewMentorSchema.mockID, params.interviewId));
 
     setFetchedResult(result[0]);
   };

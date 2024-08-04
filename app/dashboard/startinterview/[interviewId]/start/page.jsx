@@ -3,17 +3,20 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../../../../utils/DB";
 
-import MockInterviewSchema from "../../../../../utils/Schema";
+import { InterViewMentorSchema } from "../../../../../utils/Schema";
 import { eq } from "drizzle-orm";
 
 import Questions from "./_components/Questions";
 import RecordAnswer from "./_components/RecordAnswer";
+import { Button } from "../../../../../@/components/ui/button";
+import Link from "next/link";
 
 function Start({ params }) {
   const [mockQuestion, setMockQuestion] = useState();
   const [activeQuestion, setactiveQuestion] = useState(0);
   const [mockInterviewData, setMockInterviewData] = useState();
-  // console.log(mockQuestion);
+  const [isClient, setIsClient] = useState(false);
+  // console.log('Mock Q',mockQuestion);
 
   useEffect(() => {
     getInterviewDetails();
@@ -22,11 +25,17 @@ function Start({ params }) {
   const getInterviewDetails = async () => {
     const result = await db
       .select()
-      .from(MockInterviewSchema)
-      .where(eq(MockInterviewSchema.mockID, params?.interviewId));
+      .from(InterViewMentorSchema)
+      .where(eq(InterViewMentorSchema.mockID, params?.interviewId));
     const jsonResponse = JSON.parse(result[0].jsonMockInterviewResponse);
 
-    setMockQuestion(jsonResponse.questions);
+    setMockQuestion(jsonResponse.questions
+    );
+    // console.log('Mock Response ',jsonResponse.questions
+    // );
+
+
+    
     setMockInterviewData(result[0]);
   };
 
@@ -41,7 +50,40 @@ function Start({ params }) {
       <RecordAnswer
         mockQuestion={mockQuestion}
         activeQuestion={activeQuestion}
+        mockInterviewData={mockInterviewData}
+        isClient={isClient}
+        setIsClient={setIsClient}
       />
+
+      {isClient ? (
+        <div className="  flex gap-6 md:gap-12 mx-6 justify-end md:col-span-2 place-self-end">
+          {activeQuestion > 0 && (
+            <Button
+              className="bg-yellow-200"
+              onClick={() => {
+                setactiveQuestion(activeQuestion - 1);
+              }}>
+              Previous Question
+            </Button>
+          )}
+          {activeQuestion != mockQuestion?.length - 1 && (
+            <Button
+              className="bg-green-400"
+              onClick={() => {
+                setactiveQuestion(activeQuestion + 1);
+              }}>
+              Next Question
+            </Button>
+          )}
+          {activeQuestion == mockQuestion?.length - 1 && (
+            <Link
+              href={`/dashboard/startinterview/${mockInterviewData?.mockID}/feedback`}>
+              {" "}
+              <Button className="bg-red-400">End Interview</Button>
+            </Link>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }

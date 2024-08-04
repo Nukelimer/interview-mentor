@@ -15,7 +15,7 @@ import { Label } from "../../../@/components/ui/label";
 import { Textarea } from "../../../@/components/ui/textarea";
 import { chatSession } from "../../../utils/AIModelAPI";
 import { db } from "../../../utils/DB";
-import InterViewMentorSchema from "../../../utils/Schema";
+import { InterViewMentorSchema } from "../../../utils/Schema";
 import { useUser } from "@clerk/nextjs";
 import moment from "moment";
 import { useRouter } from "next/navigation";
@@ -46,7 +46,9 @@ function CreateInterview() {
     e.preventDefault();
     setLoading(true);
 
-    const inputSchema = `Job position:${Industry}, Technologies:${Technologies}, Years of Experience:${YEO} and Job Description:${Description}. Depending on Job position, Job Description, Industry and year of experience give us 10 interview questions along with answer in JSON format, give us questions and answer fields in JSON.`;
+    // const inputSchema = `Job position:${Industry}, Technologies:${Technologies}, Years of Experience:${YEO} and Job Description:${Description}. Depending on Job position, Job Description, Industry and year of experience give us 10 interview questions along with answers in JSON format it should be an array of object.`;
+    const inputSchema = `Job position:${Industry}, Technologies:${Technologies}, Years of Experience:${YEO} and Job Description:${Description}. Depending on Job position, Job Description, Industry and year of experience give us 10 interview questions along with answer in JSON format, give us questions and answer fields in JSON. the variable name should be: questions and should never change
+`;
 
     try {
       const result = await chatSession.sendMessage(inputSchema);
@@ -60,7 +62,10 @@ function CreateInterview() {
       const parsedData = parseJSON(returnedData);
       if (parsedData) {
         setData(parsedData);
+
         // console.log(parsedData);
+        
+       
 
         const respon = await db
           .insert(InterViewMentorSchema)
@@ -77,7 +82,7 @@ function CreateInterview() {
           .returning({ mockId: InterViewMentorSchema.mockID });
 
         if (respon) {
-          console.log(respon[0].mockId);
+          // console.log(respon[0].mockId);
           router.push(`/dashboard/startinterview/${respon[0]?.mockId}`);
         }
       } else {
@@ -207,11 +212,11 @@ function CreateInterview() {
       </div>
 
       {error && (
-        <Dialog open={true}>
+        <Dialog open={true} >
           <DialogContent className="outline-none">
             <DialogHeader>
               <DialogTitle className="text-xl text-red-500">Error</DialogTitle>
-              <DialogDescription className="">
+              <DialogDescription className="text-red-500">
                 please retry again.
               </DialogDescription>
             </DialogHeader>

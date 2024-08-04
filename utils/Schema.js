@@ -10,7 +10,7 @@ export const InterViewMentorSchema = pgTable("InterviewMentor", {
   createdAt: varchar("createdAt"),
   createdBy: varchar("createdBy").notNull(),
   mockID: varchar("mockID").notNull(),
-});
+})
 
 export const UserAnswer = pgTable("AnsInterviewMentor", {
   id: serial("id").primaryKey(),
@@ -18,7 +18,8 @@ export const UserAnswer = pgTable("AnsInterviewMentor", {
   question: varchar("question").notNull(),
   correctAns: text("correctAns"),
   feedback: text("feedback"),
+  yourResponse: text("yourResponse"),
   rating: varchar("rating"),
   userEmail: varchar("userEmail"),
   createdAt: varchar("createdAt"),
-});
+})

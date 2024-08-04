@@ -11,28 +11,39 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import ToastIM from "../../../../../components/Toast";
 import { chatSession } from "../../../../../../utils/AIModelAPI";
+import { db } from "../../../../../../utils/DB";
+import { UserAnswer } from "../../../../../../utils/Schema";
+import { useUser } from "@clerk/nextjs";
+import moment from "moment";
+import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
 
-export default function RecordAnswer({ mockQuestion, activeQuestion }) {
+export default function RecordAnswer({
+  mockQuestion,
+  mockInterviewData,
+  activeQuestion,
+  setIsClient,
+  isClient,
+}) {
   const {
     transcript,
     listening,
     resetTranscript,
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
+  const user = useUser();
 
   const [recording, setRecording] = useState(false);
   const [transcribedResult, setTranscribedResult] = useState("");
   const [showMicToast, setShowMicToast] = useState(false);
   const [showShortRecordingToast, setShowShortRecordingToast] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+
+  // const [loading, setLoading] = useState();
+  const [AIResult, setAIResult] = useState([]);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  useEffect(() => {
-    // console.log("Listening state:", transcribedResult);
-  }, [listening]);
 
   const checkMicrophonePermission = async () => {
     try {
@@ -47,7 +58,7 @@ export default function RecordAnswer({ mockQuestion, activeQuestion }) {
   const startListening = async () => {
     const permissionGranted = await checkMicrophonePermission();
     if (!permissionGranted) {
-      console.log("Mic not enabled");
+      // console.log("Mic not enabled");
       setShowMicToast(true);
       setTimeout(() => setShowMicToast(false), 3000);
       return;
@@ -62,34 +73,76 @@ export default function RecordAnswer({ mockQuestion, activeQuestion }) {
     setTranscribedResult(transcript);
     SpeechRecognition.stopListening();
 
-    if (transcript.length < 20) {
+    if (transcript.length < 10) {
       setShowShortRecordingToast(true);
       setTimeout(() => setShowShortRecordingToast(false), 3000);
       return;
     }
+  };
 
-    const postSchematoAPI = `Question: ${mockQuestion[activeQuestion]?.question}, User Response ${transcribedResult}, using the User response provided, give a rating based on their performance, rating should be on a scale of 1-10. In addition, provide feedback for their overall performance and areas, they need to improve on in answering the question. The feedback on where to improve on should be less than 80 words, provide the rating in JSON format: rating and feedback.`;
+  useEffect(() => {
+    if (!recording && transcribedResult.length > 10) {
+      storeUserAnswerInDatabase();
+    }
+  }, [transcribedResult]);
+
+  const storeUserAnswerInDatabase = async () => {
+    const postSchematoAPI = `Question: ${mockQuestion[activeQuestion]?.question}, User Response ${transcribedResult}, using the ${user?.user?.fullName} response provided, give a rating based on their performance, rating should be on a scale of 1-10. In addition, provide feedback for their overall performance and areas, they need to improve on in answering the question, use ${user?.user?.fullName} instead of 'User' use ${user?.user?.fullName} to make it seem like you are coaching the  ${user?.user?.fullName}. In addition, add correct answer in less than 2 paragraphs, The feedback on where to improve on should be less than 100 words, provide the rating in JSON format: rating and feedback. the structure should look like this:{rating: , feedback: } and should never change`;
 
     const postData = await chatSession.sendMessage(postSchematoAPI);
     const result = postData.response
       .text()
       .replace("```json", "")
       .replace("```", "");
-const  jsonResult = JSON.parse(result)
-    // console.log("response", result);
+    const jsonResult = JSON.parse(result);
+    setAIResult(jsonResult);
+
+    console.log("result", jsonResult);
+
+    const response = await db.insert(UserAnswer).values({
+      mockIdRef: mockInterviewData?.mockID,
+      question: mockQuestion[activeQuestion]?.question,
+      correctAns: mockQuestion[activeQuestion]?.answer,
+      feedback: jsonResult?.feedback,
+      rating: jsonResult?.rating,
+      userEmail: user?.user?.primaryEmailAddress?.emailAddress,
+      createdAt: moment().format("ddd DD-MMM-YYYY, hh:mm A"),
+      yourResponse: transcribedResult,
+    });
+
+    if (response) {
+      setTranscribedResult("");
+      resetTranscript([]);
+
+      toast("User Answer recorded successfully.");
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong",
+
+        description: "Your answer did not save to the backend.",
+      });
+    }
   };
 
-
+  // console.log(AIResult.rating, AIResult.feedback);
+  {
+  }
 
   if (!isClient) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        {" "}
+        <Loader2Icon color="green" size={50} className="animate-spin" />
+      </div>
+    );
   }
 
   if (!browserSupportsSpeechRecognition) {
     return <span>Browser doesn't support speech recognition.</span>;
   }
 
-  console.log("transcribed text:", transcript);
+  // console.log("transcribed text:", transcript);
 
   return (
     <div className="flex items-center flex-col self-stretch justify-between">
@@ -97,7 +150,7 @@ const  jsonResult = JSON.parse(result)
         <Image
           src={"../../../../../../image/webcam.svg"}
           priority
-          className="absolute"
+          className="absolute left-10"
           alt={"web cam"}
           width={200}
           height={200}
@@ -107,17 +160,17 @@ const  jsonResult = JSON.parse(result)
           mirrored
           style={{
             height: 330,
-            width: 300,
+            width: 350,
             borderRadius: "10px",
             zIndex: 10,
           }}
         />
       </div>
-      <div className="flex flex-col gap-7 mt-5 pb-6">
-        <p className="flex items-center">
+      <div className="flex flex-col gap-7 mt-5 pb-6   ">
+        <p className="flex items-center ">
           Mic Status: {listening ? <FaMicrophone /> : <BsFillMicMuteFill />}
         </p>
-        <div className="flex justify-between space-x-7">
+        <div className="flex justify-between gap-6 ">
           <Button
             className={`bg-green-400 ${recording ? "animate-pulse" : null}`}
             onClick={startListening}>
@@ -130,7 +183,7 @@ const  jsonResult = JSON.parse(result)
             Reset
           </Button>
         </div>
-        <p className="border rounded p-2">{transcript}.</p>
+        <p className="border rounded p-2 mx-6">{transcribedResult}.</p>
       </div>
       {showMicToast && (
         <ToastIM
@@ -138,9 +191,7 @@ const  jsonResult = JSON.parse(result)
         />
       )}{" "}
       {showShortRecordingToast && (
-        <ToastIM
-          text={"Your response is too short to be, record another!"}
-        />
+        <ToastIM text={"Your response is too short to be, record another!"} />
       )}
     </div>
   );

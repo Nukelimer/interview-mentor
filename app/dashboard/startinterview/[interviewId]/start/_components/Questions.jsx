@@ -9,6 +9,7 @@ import { MdPhoneInTalk } from "react-icons/md";
 function Questions({ mockQuestion, activeQuestion, setactiveQuestion }) {
   const [ToggleNotification, setToggleNotification] = useState(true);
   const [toolTip, settoolTip] = useState(false);
+  // console.log(mockQuestion);
 
   const textToSpeechHandler = (text) => {
     if ("speechSynthesis" in window) {
@@ -20,7 +21,7 @@ function Questions({ mockQuestion, activeQuestion, setactiveQuestion }) {
   };
   return (
     <div className="p-5 rounded-xl border w-full   ">
-      <div className=" mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-content-center place-items-center gap-5 pt-56 h-16 overflow-y-scroll ">
+      <div className=" mb-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 place-content-center place-items-center gap-5 pt-32 h-24 overflow-y-scroll ">
         {mockQuestion
           ? mockQuestion.map((question, idx) => (
               <div key={idx}>

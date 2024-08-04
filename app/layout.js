@@ -2,6 +2,7 @@ import { Inter, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, UserButton } from "@clerk/nextjs";
 import NestedHeader from "./components/NestedHeader";
+import { Toaster } from "../@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,8 +16,8 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html lang="en">
         <body className={`${inter.className}`}>
+          <Toaster />
           <NestedHeader />
-
           {children}
         </body>
       </html>
