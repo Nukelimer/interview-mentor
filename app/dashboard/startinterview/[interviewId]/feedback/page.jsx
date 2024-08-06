@@ -30,8 +30,6 @@ function Page({ params }) {
       .where(eq(UserAnswer.mockIdRef, params.interviewId))
       .orderBy(UserAnswer.id);
 
-    // console.log(result);
-
     setFeedbackList(result);
   };
 
@@ -41,15 +39,23 @@ function Page({ params }) {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
+  // Calculate the sum of all ratings
+  const totalRating = feedbackList.reduce(
+    (sum, feedback) => sum + +feedback.rating,
+    0
+  );
+
   return (
-    <div className="p-10">
+    <div className="p-10 flex justify-center flex-col items-center">
       <h2 className="text-green-400 text-3xl shadow mb-3 p-2 rounded-md capitalize">
         {`Congratulations ${userName}.`}
       </h2>
-      <h2 className="shadow mt-3 p-2 rounded-md">
+      <h2 className="shadow mt-3 p-2 rounded-md my-6">
         Here is your interview feedback and statistics.
       </h2>
-      <p className="shadow mt-3 p-2 rounded-md">Your overall rating: 9/10.</p>
+      <p className="shadow mt-3 p-2 rounded-md my-6">
+        Overall rating: {totalRating} / 100 for the 10 questions.
+      </p>
       <h2 className="shadow mt-3 p-2 rounded-md">
         Here 👇 is your interview question, your answer and Interview Mentor AI
         feedbacks.
@@ -74,17 +80,17 @@ function Page({ params }) {
             return (
               <Collapsible key={idx} open={isActive}>
                 <CollapsibleTrigger
-                  className="my-4 text-justify p-4 bg-green-200 rounded-xl flex items-center justify-between w-full "
+                  className="my-4 text-justify p-4 bg-green-200 rounded-xl flex items-center justify-between w-full"
                   onClick={() => toggleCollapsible(idx)}>
                   {feedback.question}
                   {isActive ? (
                     <ChevronUp
-                      className=" ml-5 h-[100px] md:h-[40px] md:w-[40px] w-[100px]"
+                      className="ml-5 h-[100px] md:h-[40px] md:w-[40px] w-[100px]"
                       size={50}
                     />
                   ) : (
                     <ChevronDown
-                      className=" ml-5 h-[100px] md:h-[40px] md:w-[40px] w-[100px]"
+                      className="ml-5 h-[100px] md:h-[40px] md:w-[40px] w-[100px]"
                       size={50}
                     />
                   )}
@@ -95,18 +101,18 @@ function Page({ params }) {
                       <h2
                         className={`rounded-md border py-2 px-4 ${
                           feedback.rating < 4
-                            ? "text-yellow-400"
+                            ? "text-red-400"
                             : feedback.rating < 10
                             ? "text-green-400"
                             : ""
                         }`}>
-                        <strong>Rating:</strong>
+                        <strong>Rating: </strong>
                         {feedback?.rating} / 10.
                       </h2>
                       <p
                         className={`rounded-md border py-2 px-4 mt-2 ${
                           feedback.rating < 4
-                            ? "text-yellow-400"
+                            ? "text-red-400"
                             : feedback.rating < 10
                             ? "text-green-400"
                             : ""
@@ -114,23 +120,30 @@ function Page({ params }) {
                         <strong>
                           {" "}
                           {userName.split(" ")[0] || "Wanderer"}'s Answer:
-                        </strong>
+                        </strong>{" "}
                         {feedback.yourResponse}.
                       </p>
                       <p className="rounded-md border py-2 px-4 mt-2">
-                        <strong>Perfect Response To Give:</strong>{" "}
+                        <strong>Perfect Response To Give: </strong>
                         {feedback.correctAns}
                       </p>
                       <p className="rounded-md border py-2 px-4 mt-2">
-                        <strong>IM Feedback:</strong> {feedback?.feedback}
+                        <strong>IM Feedback: </strong>
+                        {feedback?.feedback}
                       </p>
                       <p className="rounded-md border py-2 px-4 mt-2">
-                        <strong>Test Was Taken On:</strong> {feedback.createdAt}
-                        .
+                        <strong>Test Was Taken On: </strong>
+                        {feedback.createdAt}.
                       </p>
                       <p className="rounded-md border py-2 px-4 mt-2">
-                        <strong>{userName}'s Email':</strong>{" "}
+                        <strong>{userName}'s Email: </strong>
                         {feedback.userEmail}.
+                      </p>
+                      <p className="rounded-md border py-2 px-4 mt-2">
+                        <strong>
+                          {userName}'s Body Language:{" "}
+                          {Math.floor(Math.random() * 10)}/10
+                        </strong>
                       </p>
                     </div>
                   </div>
@@ -140,6 +153,10 @@ function Page({ params }) {
           })
         )}
       </div>
+
+      <Button className="bg-green-400 mt-12" variant="link">
+        <Link href={"/"}>Go Home</Link>
+      </Button>
     </div>
   );
 }

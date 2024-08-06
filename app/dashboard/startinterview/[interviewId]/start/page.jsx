@@ -53,6 +53,7 @@ function Start({ params }) {
         mockInterviewData={mockInterviewData}
         isClient={isClient}
         setIsClient={setIsClient}
+        setactiveQuestion={setactiveQuestion} 
       />
 
       {isClient ? (
@@ -89,3 +90,6 @@ function Start({ params }) {
 }
 
 export default Start;
+
+
+// setactiveQuestion={setactiveQuestion} activeQuestion={activeQuestion}

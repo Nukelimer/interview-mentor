@@ -10,8 +10,8 @@ import { MdOutlineClose } from "react-icons/md";
 
 const navUrls = [
   { url: "/", name: "Home" },
-  { url: "/dashboard", name: "Dashboard" },
-  { url: "/question", name: "Take Tests" },
+  { url: "/dashboard", name: "Take Tests" },
+  // { url: "/question", name: "Take Tests" },
   { url: "/about", name: "About" },
 ];
 

@@ -24,6 +24,7 @@ export default function RecordAnswer({
   activeQuestion,
   setIsClient,
   isClient,
+  setactiveQuestion,
 }) {
   const {
     transcript,
@@ -72,6 +73,7 @@ export default function RecordAnswer({
     setRecording(false);
     setTranscribedResult(transcript);
     SpeechRecognition.stopListening();
+    setactiveQuestion(activeQuestion + 1);
 
     if (transcript.length < 10) {
       setShowShortRecordingToast(true);
@@ -114,7 +116,7 @@ export default function RecordAnswer({
       setTranscribedResult("");
       resetTranscript([]);
 
-      toast("User Answer recorded successfully.");
+      toast("User Answer recorded successfully. and you have been moved to the next question automatically");
     } else {
       toast({
         variant: "destructive",
